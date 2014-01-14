@@ -1,7 +1,7 @@
 Runtastic PHP
 =========
 
-Runtastic PHP is a class to gain easy access to Runtastic activity data [www.runtastic.com](http://www.runtastic.com) via PHP.
+Runtastic PHP is a class to gain easy access to Runtastic ([www.runtastic.com](http://www.runtastic.com)) activity data via PHP.
 This is a very dirty approach since Runtastic doesn't offer an official API.
 
 REQUIREMENTS
