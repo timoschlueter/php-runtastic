@@ -21,35 +21,35 @@ FUNCTIONS
 
 **[Mandatory]** Sets the username used for logging into Runtastic
 
-### setPassword
+### setPassword()
 
 **[Mandatory]** Sets the password used for logging into Runtastic
 
-### setTimeout
+### setTimeout()
 
-Sets the connection timeout for cURL
+Sets the connection timeout (in seconds) for cURL
 
-### login
+### login()
 
 Logs into Runtastic (requires valid username and password)
 
-### Logout
+### logout()
 
 Logs out and closes the cURL connection
 
-### getUsername
+### getUsername()
 
 Returns the Username used by Runtastic
 
-### getUid
+### getUid()
 
 Returns the UID used by Runtastic
 
-### getToken
+### getToken()
 
 Returns the session token..
 
-### getActivities
+### getActivities()
 
 Returns every activity in your Runtastic account as an array of objects. 
 
