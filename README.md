@@ -163,7 +163,7 @@ This is what a typical activity object looks like:
 UPDATES
 -------
 
-I might write one or two things about this class on my blog [www.timo.in](http://www.timo.in (german)) but the code itself will be maintained on GitHub only
+I might write one or two things about this class on my blog [www.timo.in](http://www.timo.in) but the code itself will be maintained on GitHub only
 
 
 LICENSE
