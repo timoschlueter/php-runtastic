@@ -61,7 +61,7 @@
 			$postData = array(
 				"user[email]" => $this->loginUsername,
 				"user[password]" => $this->loginPassword,
-				"authenticity_token" => $runtasticToken
+				"authenticity_token" => $this->runtasticToken,
 			);
 
 			curl_setopt($this->ch, CURLOPT_URL, $this->loginUrl); 
@@ -180,7 +180,7 @@
 			if ($this->loggedIn) {			
 				preg_match("/var index_data = (.*)\;/", $this->runtasticRawData, $matches);
 				$itemJsonData = json_decode($matches[1]);
-				
+				$itemList = "";
 				foreach ($itemJsonData as $item) {
 					$itemList .= $item[0] . ",";
 				}
@@ -212,4 +212,3 @@
 			}
 		}
 	}
-?>
