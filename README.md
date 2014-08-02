@@ -49,9 +49,14 @@ Returns the UID used by Runtastic
 
 Returns the session token
 
-### getActivities()
+### getActivities($week=null, $month=null, $year=null)
+Returns every activity in your Runtastic account as an array of objects.
+If
+  - `$iWeek` is set, all activities within requested week will be returned (week starts on monday).
+  - `$iMonth` is set, all activities within requested month will be returned.
+  - `$iYear` is set, all activities within the requested year will be returned.
 
-Returns every activity in your Runtastic account as an array of objects. 
+`$iWeek` and `$iMonth` can be used together with `$iYear`. if `$iYear` is null, the current year will be used for filtering.
 
 EXAMPLE
 --------
@@ -73,9 +78,23 @@ This is an example which logs into runtastic, fetches every activity in your acc
 			echo "UID: " . $runtastic->getUid();
 			echo "<br />";
 			echo "<br />";
-		
+
+		    // get all activities
 			$myRuntasticActivities = $runtastic->getActivities();
 			echo "My latest <b>" . $myRuntasticActivities[0]->type . "</b> activity was <b>" . $myRuntasticActivities[0]->feeling . "</b>!";
+
+			// get current weeks activities
+			$myRuntasticActivities = $runtastic->getActivities(date("W"));
+
+            // get current month activities
+            $myRuntasticActivities = $runtastic->getActivities(null, date("m"));
+
+            // get all activites from week 1 of 2014
+            $myRuntasticActivities = $runtastic->getActivities(1, null, 2014);
+
+            // get all activities from 2013:
+            $myRuntasticActivities = $runtastic->getActivities(null, null, 2013);
+
 		}
 	?>
 ```
