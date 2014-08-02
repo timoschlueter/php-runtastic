@@ -250,9 +250,74 @@
 
                 $sessionsOutput = curl_exec($this->ch);
                 $this->logout();
-                return json_decode($sessionsOutput);
+                return new RuntasticActivityList($sessionsOutput);
             } else {
                 return false;
             }
+        }
+    }
+
+
+    class RuntasticActivityList implements ArrayAccess {
+        public function __construct($sJSON = false) {
+            if ($sJSON) $this->_set(json_decode($sJSON));
+        }
+
+
+        public function filterBy($aFilter) {
+            $tmp = array();
+            foreach ($this as $oActivity) {
+                $blKeep = false;
+                foreach ($aFilter as $key => $val) {
+                    if ($oActivity->$key == $val) {
+                        $blKeep = true;
+                    } else {
+                        $blKeep = false;
+                        break;
+                    }
+                }
+                if ($blKeep)
+                    $tmp[] = $oActivity;
+            }
+            $this->_set($tmp, true);
+        }
+
+        private function _set($data, $blClean = false) {
+            if ($blClean) $this->_reset();
+
+            foreach ($data AS $key => $value) {
+                $this->$key = $value;
+            }
+            return $this;
+        }
+
+        private function _reset() {
+            foreach ($this as $key => $val) {
+                unset($this->$key);
+            }
+        }
+
+        // ArrayAccess functions //
+        public function offsetExists($offset) {
+            if (isset($this->$offset)) return true;
+            return false;
+        }
+
+        public function offsetGet($offset) {
+            var_dump($offset);
+            if (isset($this->$offset)) return $this->$offset;
+            return false;
+        }
+
+        public function offsetSet($offset, $value) {
+            if (is_null($offset)) {
+                $this->_set($value);
+            } else {
+                $this->_set(array($offset => $value));
+            }
+        }
+
+        public function offsetUnset($offset) {
+            unset($this->$offset);
         }
     }
