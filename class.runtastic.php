@@ -34,12 +34,10 @@
 		private $sessionsApiUrl;
 		private $ch;
 		private $cookieJar;
-		private $authenticityToken;
 		private $loggedIn;
 		private $runtasticUsername;
 		private $runtasticUid;
 		private $runtasticToken;
-		private $runtasticActivityIds;
 		private $runtasticRawData;
 		private $doc;
 		private $timeout;
@@ -49,7 +47,7 @@
 			$this->loginUrl = "https://www.runtastic.com/en/d/users/sign_in.json";
 			$this->logoutUrl = "https://www.runtastic.com/en/d/users/sign_out";
 			$this->sessionsApiUrl = "https://www.runtastic.com/api/run_sessions/json";
-			$this->ch = curl_init();
+			$this->ch = null;
 			$this->doc = new DOMDocument();
 			$this->cookieJar = getcwd() . "/cookiejar";
 			$this->runtasticToken = "";
@@ -58,6 +56,10 @@
 		}
 		
 		public function login() {
+            if ($this->ch == null) {
+                $this->ch = curl_init();
+            }
+
 			$postData = array(
 				"user[email]" => $this->loginUsername,
 				"user[password]" => $this->loginPassword,
@@ -77,8 +79,6 @@
 			$responseOutputJson = json_decode($responseOutput);
 
 			if ($responseStatus["http_code"] == 200) {
-				$this->loggedIn = true;
-				
 				$this->doc->loadHTML($responseOutputJson->update);
 				$inputTags = $this->doc->getElementsByTagName('input');
 				foreach ($inputTags as $inputTag) {
@@ -133,7 +133,9 @@
 			curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'GET');
 			curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->timeout);
 			if (curl_exec($this->ch)) {
-				curl_close($this->ch); 
+				curl_close($this->ch);
+                $this->ch = null;
+                $this->loggedIn = false;
 				return true;
 			} else {
 				return false;
@@ -176,39 +178,81 @@
 			}
 		}
 		
-		public function getActivities() {
-			if ($this->loggedIn) {			
-				preg_match("/var index_data = (.*)\;/", $this->runtasticRawData, $matches);
-				$itemJsonData = json_decode($matches[1]);
-				$itemList = "";
-				foreach ($itemJsonData as $item) {
-					$itemList .= $item[0] . ",";
-				}
-				
-				$itemList = substr($itemList, 0, -1);
+        /**
+         * Returns all activities.
+         * If
+         *  - $iWeek is set, only the requested week will be returned.
+         *  - $iMonth is set, only the requested month will be returned.
+         *  - $iYear is set, only the requested year will be returned.
+         *
+         * $iWeek and $iMonth can be used together with $iYear. if $iYear is null, the current year will
+         * be used for filtering.
+         *
+         * @param int|null $iWeek Number of the wanted week.
+         * @param int|null $iMonth Number of the requested month.
+         * @param int|null $iYear Number of the requested year.
+         * @return bool|mixed
+         */
+        public function getActivities($iWeek = null, $iMonth = null, $iYear = null) {
+            if (!$this->loggedIn) $this->login();
+            if ($this->loggedIn) {
+                preg_match("/var index_data = (.*)\;/", $this->runtasticRawData, $matches);
+                $itemJsonData = json_decode($matches[1]);
+                $items = array();
 
-				$postData = array(
-					"user_id" => $this->getUid(),
-					"items" => $itemList,
-					"authenticity_token" => $this->getToken()
-				);
-				
-				curl_setopt($this->ch, CURLOPT_URL, $this->sessionsApiUrl);
-				curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1); 
-				curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'POST');
-				curl_setopt($this->ch,CURLOPT_POST, count($postData));
-				curl_setopt($this->ch,CURLOPT_POSTFIELDS, $postData);
-				curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieJar);
-				curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieJar);
-				curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->timeout);
-				
-				$sessionsOutput = curl_exec($this->ch); 
-				
-				$sessionOutputJson = json_decode($sessionsOutput);
-				$this->logout();
-				return $sessionOutputJson;
-			} else {
-				return false;
-			}
-		}
-	}
+                if ($iMonth != null) {
+                    if ($iMonth < 10) {
+                        $iMonth = "0" . (int)$iMonth;
+                    }
+                }
+
+                foreach ($itemJsonData as $item) {
+                    if ($iWeek != null) { /* Get week statistics */
+                        if ($iYear == null) {
+                            $iYear = date("Y");
+                        }
+                        $sMonday = date("Y-m-d", strtotime("{$iYear}-W{$iWeek}"));
+                        $sSunday = date("Y-m-d", strtotime("{$iYear}-W{$iWeek}-7"));
+                        if ($sMonday <= $item[1] && $sSunday >= $item[1])
+                            $items[] = $item[0];
+
+                    } elseif ($iMonth != null) { /* Get month statistics */
+                        if ($iYear == null) {
+                            $iYear = date("Y");
+                        }
+                        $tmpDate = $iYear . "-" . $iMonth . "-";
+                        if ($tmpDate . "01" <= $item[1] && $tmpDate . "31" >= $item[1])
+                            $items[] = $item[0];
+                    } elseif ($iYear != null) { /* Get year statistics */
+                        $tmpDate = $iYear . "-";
+                        if ($tmpDate . "01-01" <= $item[1] && $tmpDate . "12-31" >= $item[1])
+                            $items[] = $item[0];
+                    } else { /* Get all statistics */
+                        $items[] = $item[0];
+                    }
+                }
+                $itemList = implode($items, ",");
+
+                $postData = array(
+                    "user_id" => $this->getUid(),
+                    "items" => $itemList,
+                    "authenticity_token" => $this->getToken()
+                );
+
+                curl_setopt($this->ch, CURLOPT_URL, $this->sessionsApiUrl);
+                curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'POST');
+                curl_setopt($this->ch, CURLOPT_POST, count($postData));
+                curl_setopt($this->ch, CURLOPT_POSTFIELDS, $postData);
+                curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieJar);
+                curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieJar);
+                curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->timeout);
+
+                $sessionsOutput = curl_exec($this->ch);
+                $this->logout();
+                return json_decode($sessionsOutput);
+            } else {
+                return false;
+            }
+        }
+    }
