@@ -1,56 +1,50 @@
-Runtastic PHP
-=========
-
+#Runtastic PHP
 Runtastic PHP is a class to gain easy access to Runtastic ([www.runtastic.com](http://www.runtastic.com)) activity data via PHP.
 This is a very dirty approach since Runtastic doesn't offer an official API.
 
-REQUIREMENTS
--------
-
+##REQUIREMENTS
 This class requieres at least PHP 5.2 and the JSON and CURL (with SSL) extension.
 
-INSTALLATION
---------
-
+##INSTALLATION
 Simply include the class and you are good to go.
 
-FUNCTIONS
---------
-
-### setUsername()
+##CLASSES
+###Runtastic
+------
+#### setUsername()
 
 **[Mandatory]** Sets the username used for logging into Runtastic
 
-### setPassword()
+#### setPassword()
 
 **[Mandatory]** Sets the password used for logging into Runtastic
 
-### setTimeout()
+#### setTimeout()
 
 Sets the connection timeout (in seconds) for cURL
 
-### login()
+#### login()
 
 Logs into Runtastic (requires valid username and password)
 
-### logout()
+#### logout()
 
 Logs out and closes the cURL connection
 
-### getUsername()
+#### getUsername()
 
 Returns the Username used by Runtastic
 
-### getUid()
+#### getUid()
 
 Returns the UID used by Runtastic
 
-### getToken()
+#### getToken()
 
 Returns the session token
 
-### getActivities($week=null, $month=null, $year=null)
-Returns every activity in your Runtastic account as an array of objects.
+#### getActivities($week=null, $month=null, $year=null)
+Returns every activity in your Runtastic account as a RuntasticActivityList (usable as array) of objects.
 If
   - `$iWeek` is set, all activities within requested week will be returned (week starts on monday).
   - `$iMonth` is set, all activities within requested month will be returned.
@@ -58,9 +52,16 @@ If
 
 `$iWeek` and `$iMonth` can be used together with `$iYear`. if `$iYear` is null, the current year will be used for filtering.
 
-EXAMPLE
---------
 
+
+### RuntasticActivityList
+------
+#### filterBy(array())
+`$runtastic->getActivities()` returns an RuntasticActivityList.
+Furthermore, you are able to filter the results (i.e. just cycling). For an example see below:
+
+
+##EXAMPLE
 This is an example which logs into runtastic, fetches every activity in your account and outputs internal Runtastic data (Username, UID) and a simple string.
 
 ```php
@@ -94,6 +95,10 @@ This is an example which logs into runtastic, fetches every activity in your acc
 
             // get all activities from 2013:
             $myRuntasticActivities = $runtastic->getActivities(null, null, 2013);
+
+            // get all activities and filter by "type" = "strolling" and "weather" = "good":
+            $myRuntasticActivities = $runtastic->getActivities();
+            $myRuntasticActivities->filterBy(array("type"=>"strolling", "weather"=>"good"));
 
 		}
 	?>
