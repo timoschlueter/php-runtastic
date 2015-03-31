@@ -89,7 +89,7 @@
 			
 				$aTags = $this->doc->getElementsByTagName('a');
 				foreach ($aTags as $aTag) {
-					if (preg_match("/https\:\/\/www\.runtastic\.com\/en\/users\/(.*)\/dashboard/", $aTag->getAttribute("href"), $matches)) {
+					if (preg_match("/\/en\/users\/(.*)\/dashboard/", $aTag->getAttribute("href"), $matches)) {
 						$this->runtasticUsername = $matches[1];
 					}
 				}
