@@ -104,10 +104,9 @@
 				curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->timeout);
 				
 				$frontpageOutput = curl_exec($this->ch); 
-				
+								
 				$this->doc->loadHTML($frontpageOutput);
 				$scriptTags = $this->doc->getElementsByTagName('script');
-						
 				foreach ($scriptTags as $scriptTag) {
 					if(strstr($scriptTag->nodeValue, 'index_data')) {
 						$this->runtasticRawData = $scriptTag->nodeValue;
@@ -196,6 +195,7 @@
         public function getActivities($iWeek = null, $iMonth = null, $iYear = null) {
             if (!$this->loggedIn) $this->login();
             if ($this->loggedIn) {
+
                 preg_match("/var index_data = (.*)\;/", $this->runtasticRawData, $matches);
                 $itemJsonData = json_decode($matches[1]);
                 $items = array();
@@ -231,14 +231,19 @@
                         $items[] = $item[0];
                     }
                 }
-                $itemList = implode($items, ",");
+				
+				/* Since we can only get the latest 420 activities, we sort them by ID to get the latest ones */
+				arsort($items);
+				$items = array_splice($items, 0, 419);
 
+                $itemList = implode($items, ",");
+				
                 $postData = array(
                     "user_id" => $this->getUid(),
-                    "items" => $itemList,
+                    "items" =>  $itemList, 
                     "authenticity_token" => $this->getToken()
                 );
-
+				
                 curl_setopt($this->ch, CURLOPT_URL, $this->sessionsApiUrl);
                 curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
                 curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'POST');
@@ -247,9 +252,10 @@
                 curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieJar);
                 curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieJar);
                 curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->timeout);
-
+				
                 $sessionsOutput = curl_exec($this->ch);
                 $this->logout();
+
                 return new RuntasticActivityList($sessionsOutput);
             } else {
                 return false;
@@ -257,12 +263,10 @@
         }
     }
 
-
     class RuntasticActivityList implements ArrayAccess {
         public function __construct($sJSON = false) {
             if ($sJSON) $this->_set(json_decode($sJSON));
         }
-
 
         public function filterBy($aFilter) {
             $tmp = array();
@@ -304,7 +308,6 @@
         }
 
         public function offsetGet($offset) {
-            var_dump($offset);
             if (isset($this->$offset)) return $this->$offset;
             return false;
         }
@@ -321,3 +324,4 @@
             unset($this->$offset);
         }
     }
+?>
