@@ -1,6 +1,7 @@
 {
   "name": "timoschlueter/php-runtastic",
   "description": "It is a class to gain easy access to Runtastic (www.runtastic.com) activity data via PHP. This is a very dirty approach since Runtastic doesn't offer an official API.",
+  "license": "MIT",
   "authors": [
     {
       "name": "Timo Schlueter",
