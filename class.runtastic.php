@@ -176,6 +176,16 @@
 				return false;
 			}
 		}
+
+		public function getResponseStatusCode() {
+			if (isset($this->ch)) {
+				$curlInfo = curl_getinfo($this->ch);
+				if (isset($curlInfo['http_code'])) {
+					return $curlInfo['http_code'];
+				}
+			}
+			return null;
+		}
 		
         /**
          * Returns all activities.
