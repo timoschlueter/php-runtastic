@@ -242,44 +242,44 @@
                     }
                 }
 
-								/* Since we can only get the latest 420 activities, we sort them by ID to get the latest ones */
-								arsort($items);
-								$border = 419;
-								$activityArray = array();
-								$j = ceil(count($items)/$border);
-
-								for ($i=1;$i<=$j;$i++) {
-									$lower = ($border*($i-1));
-									$upper = (($border * $i)-1);
-
-									if ($i==ceil(count($items)/$border)) {
-										$upper = (($border * ($i-1))+count($items)%$border);
-									}
-									$items = array_splice($items, $lower, ($upper-$lower));
-									$itemList = implode($items, ",");
-
-									$postData = array(
-										"user_id" => $this->getUid(),
-										"items" =>  $itemList,
-										"authenticity_token" => $this->getToken()
-									);
-
-									curl_setopt($this->ch, CURLOPT_URL, $this->sessionsApiUrl);
-									curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
-									curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'POST');
-									curl_setopt($this->ch, CURLOPT_POST, count($postData));
-									curl_setopt($this->ch, CURLOPT_POSTFIELDS, $postData);
-									curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieJar);
-									curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieJar);
-									curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->timeout);
-
-									$sessionsOutput = curl_exec($this->ch);
-									$activityArray = $activityArray + json_decode($sessionsOutput);
-								}
-
-								$this->logout();
-
-								return new RuntasticActivityList(json_encode($activityArray));
+				/* Since we can only get the latest 420 activities, we sort them by ID to get the latest ones */
+				arsort($items);
+				$border = 419;
+				$activityArray = array();
+				$j = ceil(count($items)/$border);
+				
+				for ($i=1;$i<=$j;$i++) {
+					$lower = ($border*($i-1));
+					$upper = (($border * $i)-1);
+				
+					if ($i==ceil(count($items)/$border)) {
+						$upper = (($border * ($i-1))+count($items)%$border);
+					}
+					$items = array_splice($items, $lower, ($upper-$lower));
+					$itemList = implode($items, ",");
+				
+					$postData = array(
+						"user_id" => $this->getUid(),
+						"items" =>  $itemList,
+						"authenticity_token" => $this->getToken()
+					);
+				
+					curl_setopt($this->ch, CURLOPT_URL, $this->sessionsApiUrl);
+					curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
+					curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'POST');
+					curl_setopt($this->ch, CURLOPT_POST, count($postData));
+					curl_setopt($this->ch, CURLOPT_POSTFIELDS, $postData);
+					curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieJar);
+					curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieJar);
+					curl_setopt($this->ch, CURLOPT_TIMEOUT, $this->timeout);
+				
+					$sessionsOutput = curl_exec($this->ch);
+					$activityArray = $activityArray + json_decode($sessionsOutput);
+				}
+				
+				$this->logout();
+				
+				return new RuntasticActivityList(json_encode($activityArray));
 								
             } else {
                 return false;
