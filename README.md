@@ -1,15 +1,16 @@
-#Runtastic PHP
+# Runtastic PHP
 Runtastic PHP is a class to gain easy access to Runtastic ([www.runtastic.com](http://www.runtastic.com)) activity data via PHP.
 This is a very dirty approach since Runtastic doesn't offer an official API.
 
-##REQUIREMENTS
+## REQUIREMENTS
 This class requieres at least PHP 5.2 and the JSON and CURL (with SSL) extension.
 
-##INSTALLATION
+## INSTALLATION
 Simply include the class and you are good to go.
 
-##CLASSES
-###Runtastic
+## CLASSES
+
+### Runtastic
 ------
 #### setUsername()
 
@@ -66,9 +67,10 @@ This is an example which logs into runtastic, fetches every activity in your acc
 
 ```php
 	<?php
-		include("class.runtastic.php");
+		
+		use Runtastic/Runtastic;
 	
-		$runtastic = New Runtastic();
+		$runtastic = new Runtastic();
 		$runtastic->setUsername("user@example.com");
 		$runtastic->setPassword("verysecurepassword");
 		$runtastic->setTimeout(20);
@@ -98,7 +100,7 @@ This is an example which logs into runtastic, fetches every activity in your acc
 
             // get all activities and filter by "type" = "strolling" and "weather" = "good":
             $myRuntasticActivities = $runtastic->getActivities();
-            $myRuntasticActivities->filterBy(array("type"=>"strolling", "weather"=>"good"));
+            $myRuntasticActivities->filterBy(["type"=>"strolling", "weather"=>"good"]);
 
 		}
 	?>
@@ -182,12 +184,6 @@ This is what a typical activity object looks like:
 			}
 		}
 	}
-
-	
-UPDATES
--------
-
-I might write one or two things about this class on my blog [www.timo.in](http://www.timo.in) but the code itself will be maintained on GitHub only
 
 
 LICENSE

@@ -1,12 +1,17 @@
 {
   "name": "timoschlueter/php-runtastic",
-  "version": "2",
-  "description": "It is a class to gain easy access to Runtastic (www.runtastic.com) activity data via PHP. This is a very dirty approach since Runtastic doesn't offer an official API.",
+  "version": "3",
+  "description": "Runtastic API for PHP",
+  "keywords": ["runtastic", "api", "workouts", "sports"],
   "license": "MIT",
   "authors": [
     {
       "name": "Timo Schlueter",
       "email": "timo.schlueter@me.com"
+    },
+    {
+      "name": "Manuel Garcia",
+      "email": "mgarciadelojo@gmail.com"
     }
   ],
   "require": {
@@ -14,6 +19,8 @@
     "ext-curl": "*"
   },
   "autoload": {
-    "classmap": ["class.runtastic.php"]
+    "psr-4": {
+      "Runtastic\\": "src"
+    }
   }
 }
