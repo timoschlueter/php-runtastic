@@ -78,7 +78,7 @@ class Runtastic
     public function __construct()
     {
         libxml_use_internal_errors(true);
-        $this->doc = new DOMDocument();
+        $this->doc = new \DOMDocument();
     }
 
     /**
