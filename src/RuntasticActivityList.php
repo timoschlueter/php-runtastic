@@ -28,7 +28,7 @@ SOFTWARE.
 
 namespace Runtastic;
 
-class RuntasticActivityList implements ArrayAccess
+class RuntasticActivityList implements \ArrayAccess
 {
     public function __construct($sJSON = false)
     {
