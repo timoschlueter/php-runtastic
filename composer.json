@@ -1,6 +1,6 @@
 {
-  "name": "timoschlueter/php-runtastic",
-  "version": "3",
+  "name": "mgarciadelojo/runtastic",
+  "version": "1",
   "description": "Runtastic API for PHP",
   "keywords": ["runtastic", "api", "workouts", "sports"],
   "license": "MIT",
