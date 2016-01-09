@@ -247,7 +247,7 @@ class Runtastic
 
         $responseOutputJson = $this->post(self::RUNTASTIC_LOGIN_URL, $postData);
 
-        if ($this->getResponseStatusCode() == self::HTTP_OK) {
+        if ($this->getResponseStatusCode() == self::HTTP_OK && isset($responseOutputJson->update)) {
             $this->setDataFromResponse($responseOutputJson->update);
 
             $frontpageOutput = $this->get(sprintf(self::RUNTASTIC_SPORT_SESSIONS_URL, $this->getUsername()));
@@ -432,7 +432,7 @@ class Runtastic
     {
         $requestUrl = $this->parseGet($request, $parameters);
 
-        return $this->request($requestUrl, [], null, $json);
+        return $this->request($requestUrl);
     }
 
     /**
@@ -444,7 +444,7 @@ class Runtastic
      */
     public function put($request, $parameters = [])
     {
-        return $this->request($request, $parameters, 'PUT', $json);
+        return $this->request($request, $parameters, 'PUT');
     }
 
     /**
@@ -456,7 +456,7 @@ class Runtastic
      */
     public function post($request, $parameters = [])
     {
-        return $this->request($request, $parameters, null, $json);
+        return $this->request($request, $parameters, null);
     }
 
     /**
@@ -468,6 +468,6 @@ class Runtastic
      */
     public function delete($request, $parameters = [])
     {
-        return $this->request($request, $parameters, 'DELETE', $json);
+        return $this->request($request, $parameters, 'DELETE');
     }
 }
