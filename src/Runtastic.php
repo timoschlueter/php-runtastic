@@ -307,25 +307,23 @@ class Runtastic
                 $iMonth = str_pad($iMonth, 2, '0', STR_PAD_LEFT);
             }
 
+            if (is_null($iYear)) {
+                $iYear = date("Y");
+            }
+
             foreach ($itemJsonData as $item) {
-                if ($iWeek != null) { /* Get week statistics */
-                    if ($iYear == null) {
-                        $iYear = date("Y");
-                    }
+                if (!is_null($iWeek)) { /* Get week statistics */
                     $sMonday = date("Y-m-d", strtotime("{$iYear}-W{$iWeek}"));
                     $sSunday = date("Y-m-d", strtotime("{$iYear}-W{$iWeek}-7"));
                     if ($sMonday <= $item[1] && $sSunday >= $item[1]) {
                         $items[] = $item[0];
                     }
-                } elseif ($iMonth != null) { /* Get month statistics */
-                    if ($iYear == null) {
-                        $iYear = date("Y");
-                    }
+                } elseif (!is_null($iMonth)) { /* Get month statistics */
                     $tmpDate = $iYear."-".$iMonth."-";
                     if ($tmpDate."01" <= $item[1] && $tmpDate."31" >= $item[1]) {
                         $items[] = $item[0];
                     }
-                } elseif ($iYear != null) { /* Get year statistics */
+                } elseif (!is_null($iYear)) { /* Get year statistics */
                     $tmpDate = $iYear."-";
                     if ($tmpDate."01-01" <= $item[1] && $tmpDate."12-31" >= $item[1]) {
                         $items[] = $item[0];
