@@ -28,20 +28,28 @@ SOFTWARE.
 
 namespace Runtastic;
 
-class RuntasticActivityList implements \ArrayAccess
+class RuntasticActivityList implements \ArrayAccess, \Countable
 {
-    public function __construct($sJSON = false)
+    /**
+     * RuntasticActivityList constructor.
+     *
+     * @param array $items
+     */
+    public function __construct(array $items = [])
     {
-        if ($sJSON) {
-            $this->_set(json_decode($sJSON));
-        }
+        $this->_set($items);
     }
 
+    /**
+     * @param string $aFilter
+     */
     public function filterBy($aFilter)
     {
-        $tmp = array();
+        $tmp = [];
+
         foreach ($this as $oActivity) {
             $blKeep = false;
+
             foreach ($aFilter as $key => $val) {
                 if ($oActivity->$key == $val) {
                     $blKeep = true;
@@ -50,18 +58,26 @@ class RuntasticActivityList implements \ArrayAccess
                     break;
                 }
             }
+
             if ($blKeep) {
                 $tmp[] = $oActivity;
             }
         }
+
         $this->_set($tmp, true);
     }
 
+    /**
+     * @param  array $data
+     * @param  bool  $blClean
+     * @return RuntasticActivityList
+     */
     private function _set($data, $blClean = false)
     {
         if ($blClean) {
             $this->_reset();
         }
+
         foreach ($data AS $key => $value) {
             $this->$key = $value;
         }
@@ -76,7 +92,10 @@ class RuntasticActivityList implements \ArrayAccess
         }
     }
 
-    // ArrayAccess functions //
+    /**
+     * @param  mixed $offset
+     * @return bool
+     */
     public function offsetExists($offset)
     {
         if (isset($this->$offset)) {
@@ -86,6 +105,10 @@ class RuntasticActivityList implements \ArrayAccess
         return false;
     }
 
+    /**
+     * @param  mixed $offset
+     * @return bool
+     */
     public function offsetGet($offset)
     {
         if (isset($this->$offset)) {
@@ -95,6 +118,10 @@ class RuntasticActivityList implements \ArrayAccess
         return false;
     }
 
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     */
     public function offsetSet($offset, $value)
     {
         if (is_null($offset)) {
@@ -104,8 +131,19 @@ class RuntasticActivityList implements \ArrayAccess
         }
     }
 
+    /**
+     * @param mixed $offset
+     */
     public function offsetUnset($offset)
     {
         unset($this->$offset);
+    }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count((array) $this);
     }
 }
