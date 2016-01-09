@@ -250,7 +250,7 @@ class Runtastic
         if ($this->getResponseStatusCode() == self::HTTP_OK) {
             $this->setDataFromResponse($responseOutputJson->update);
 
-            $frontpageOutput = $this->get(sprintf(self::RUNTASTIC_SPORT_SESSIONS_URL, $this->getUsername()), [], false);
+            $frontpageOutput = $this->get(sprintf(self::RUNTASTIC_SPORT_SESSIONS_URL, $this->getUsername()));
             $this->setDataFromResponse($frontpageOutput);
 
             $this->loggedIn = true;
@@ -385,10 +385,9 @@ class Runtastic
      * @param  string      $url
      * @param  array       $parameters
      * @param  string|null $request
-     * @param  bool        $json
      * @return object|null
      */
-    protected function request($url, $parameters = [], $request = null, $json = true)
+    protected function request($url, $parameters = [], $request = null)
     {
         $this->lastRequest     = $url;
         $this->lastRequestData = $parameters;
@@ -419,7 +418,7 @@ class Runtastic
         $this->lastRequestInfo = curl_getinfo($curl);
         curl_close($curl);
 
-        return !$response ? null : ($json ? $this->parseResponse($response) : $response);
+        return $response;
     }
 
     /**
@@ -427,10 +426,9 @@ class Runtastic
      *
      * @param  string $request
      * @param  array  $parameters
-     * @param  bool   $json
      * @return string
      */
-    public function get($request, $parameters = [], $json = true)
+    public function get($request, $parameters = [])
     {
         $requestUrl = $this->parseGet($request, $parameters);
 
@@ -442,10 +440,9 @@ class Runtastic
      *
      * @param  string $request
      * @param  array  $parameters
-     * @param  bool   $json
      * @return string
      */
-    public function put($request, $parameters = [], $json = true)
+    public function put($request, $parameters = [])
     {
         return $this->request($request, $parameters, 'PUT', $json);
     }
@@ -455,10 +452,9 @@ class Runtastic
      *
      * @param  string $request
      * @param  array  $parameters
-     * @param  bool   $json
      * @return string
      */
-    public function post($request, $parameters = [], $json = true)
+    public function post($request, $parameters = [])
     {
         return $this->request($request, $parameters, null, $json);
     }
@@ -468,10 +464,9 @@ class Runtastic
      *
      * @param  string $request
      * @param  array  $parameters
-     * @param  bool   $json
      * @return string
      */
-    public function delete($request, $parameters = [], $json = true)
+    public function delete($request, $parameters = [])
     {
         return $this->request($request, $parameters, 'DELETE', $json);
     }
