@@ -1,121 +1,95 @@
-#Runtastic PHP
-Runtastic PHP is a class to gain easy access to Runtastic ([www.runtastic.com](http://www.runtastic.com)) activity data via PHP.
-This is a very dirty approach since Runtastic doesn't offer an official API.
+# Runtastic PHP Library
 
-##REQUIREMENTS
-This class requieres at least PHP 5.2 and the JSON and CURL (with SSL) extension.
+Runtastic-PHP is a PHP library that allows you to connect to Runtastic ([www.runtastic.com](http://www.runtastic.com)) and get all your activities. This is a very dirty approach since Runtastic doesn't offer an official API.
 
-##INSTALLATION
-Simply include the class and you are good to go.
+The only 
 
-##CLASSES
-###Runtastic
-------
-#### setUsername()
+## Getting Started
+
+### Prerequisites
+
+- PHP >= 5.2
+- JSON and CURL (with SSL) PHP extensions.
+
+### Installation
+
+```sh
+composer require timoschlueter/php-runtastic
+```
+
+### Basic Usage
+
+```php
+<?php
+
+require __DIR__ . '/path/to/autoload.php';
+
+use Runtastic\Runtastic;
+
+$r = new Runtastic();
+$r->setUsername("your@email.com")->setPassword("your@password");
+
+$activities = $r->getActivities();
+echo "Total Number of activities: " . count($activities) . PHP_EOL;
+
+foreach ($activities as $activity) {
+    echo $activity->id . PHP_EOL;
+}
+```
+
+## Runtastic Class Methods
+
+#### `setUsername()`
 
 **[Mandatory]** Sets the username used for logging into Runtastic
 
-#### setPassword()
+#### `setPassword()`
 
 **[Mandatory]** Sets the password used for logging into Runtastic
 
-#### setTimeout()
+#### `setTimeout()`
 
-Sets the connection timeout (in seconds) for cURL
+Sets the connection timeout (in seconds) for cURL. `Defaults to 10`
 
-#### login()
+#### `login()`
 
 Logs into Runtastic (requires valid username and password)
 
-#### logout()
+#### `logout()`
 
 Logs out and closes the cURL connection
 
-#### getUsername()
+#### `getUsername()`
 
 Returns the Username used by Runtastic
 
-#### getUid()
+#### `getUid()`
 
 Returns the UID used by Runtastic
 
-#### getToken()
+#### `getToken()`
 
-Returns the session token
+Returns the session's token
 
-#### getActivities($week=null, $month=null, $year=null)
-Returns every activity in your Runtastic account as a RuntasticActivityList (usable as array) of objects.
-If
-  - `$iWeek` is set, all activities within requested week will be returned (week starts on monday).
+#### `getActivities($iWeek = null, $iMonth = null, $iYear = null)`
+
+Returns every activity in your Runtastic account as a RuntasticActivityList (usable as array) of objects. If
+  - `$iWeek` is set, all activities within requested number of week will be returned (week starts on monday).
   - `$iMonth` is set, all activities within requested month will be returned.
   - `$iYear` is set, all activities within the requested year will be returned.
 
-`$iWeek` and `$iMonth` can be used together with `$iYear`. if `$iYear` is null, the current year will be used for filtering.
+`$iWeek` and `$iMonth` can be used together with `$iYear`. if `$iYear` is null, the current year will be used for filtering. If you don't specify any argument, then, this function will return all activities.
 
 
+### RuntasticActivityList Class Methods
 
-### RuntasticActivityList
-------
-#### filterBy(array())
-`$runtastic->getActivities()` returns an RuntasticActivityList.
-Furthermore, you are able to filter the results (i.e. just cycling). For an example see below:
+The function `getActivities` of the Runtastic class that we saw before returns an RuntasticActivityList object. This class allows you to filter easily the activities using the following method:
 
+#### `filterBy([])`
 
-##EXAMPLE
-This is an example which logs into runtastic, fetches every activity in your account and outputs internal Runtastic data (Username, UID) and a simple string.
+You can filter by every object defined in the Activity Object. This is what a typical activity object looks like:
 
-```php
-	<?php
-		include("class.runtastic.php");
-	
-		$runtastic = New Runtastic();
-		$runtastic->setUsername("user@example.com");
-		$runtastic->setPassword("verysecurepassword");
-		$runtastic->setTimeout(20);
-
-		if ($runtastic->login()) {
-			echo "Username: " . $runtastic->getUsername();
-			echo "<br />";
-			echo "UID: " . $runtastic->getUid();
-			echo "<br />";
-			echo "<br />";
-
-		    // get all activities
-			$myRuntasticActivities = $runtastic->getActivities();
-			echo "My latest <b>" . $myRuntasticActivities[0]->type . "</b> activity was <b>" . $myRuntasticActivities[0]->feeling . "</b>!";
-
-			// get current weeks activities
-			$myRuntasticActivities = $runtastic->getActivities(date("W"));
-
-            // get current month activities
-            $myRuntasticActivities = $runtastic->getActivities(null, date("m"));
-
-            // get all activites from week 1 of 2014
-            $myRuntasticActivities = $runtastic->getActivities(1, null, 2014);
-
-            // get all activities from 2013:
-            $myRuntasticActivities = $runtastic->getActivities(null, null, 2013);
-
-            // get all activities and filter by "type" = "strolling" and "weather" = "good":
-            $myRuntasticActivities = $runtastic->getActivities();
-            $myRuntasticActivities->filterBy(array("type"=>"strolling", "weather"=>"good"));
-
-		}
-	?>
 ```
-
-#### Output:
-
-	Username: Example-User
-	UID: 1337
-
-	My latest cycling activity was awesome!
-	
-ACTIVITY OBJECT
---------
-
-This is what a typical activity object looks like:
-
 	array(1) {
 		[0]=>
 			object(stdClass)#11 (24) {
@@ -182,12 +156,14 @@ This is what a typical activity object looks like:
 			}
 		}
 	}
+```
 
-	
-UPDATES
--------
+So, for example, you can filter by like this:
 
-I might write one or two things about this class on my blog [www.timo.in](http://www.timo.in) but the code itself will be maintained on GitHub only
+```php
+$activities = $r->getActivities()->filterBy(["type"=>"strolling", "weather"=>"good"]);
+echo "Number of strolling activities with good weather: " . count($activities) . PHP_EOL;
+```
 
 
 LICENSE
